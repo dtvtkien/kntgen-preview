@@ -80,7 +80,8 @@ class PhoneScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final phone = phoneMedia(context);
     // ScreenUtilInit sizes from the browser window (View), not MediaQuery; pin it to the phone.
-    ScreenUtil.configure(data: phone, designSize: kDesign, splitScreenMode: false, minTextAdapt: false);
+    final design = designFor(kPageDefs[stack.last.slug], phone.size);   // D1248: the top page's size class
+    ScreenUtil.configure(data: phone, designSize: design, splitScreenMode: false, minTextAdapt: false);
     return MediaQuery(
       data: phone,
       child: Builder(
@@ -528,8 +529,8 @@ class _OverlayPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final k = kDevice.value.scale;
-    final px = image.width / kDesign.width;
+    final k = meta.scale;
+    final px = image.width / meta.drawnWidth;
     final (top, bottom) = meta.screenBand;
     final h = size.height;
     final difference = mode == CompareMode.difference;
@@ -654,7 +655,7 @@ class _HotspotLayerState extends State<_HotspotLayer> {
     if (isControl == null || root == null || space is! RenderBox || !space.hasSize) return;
     if (_live.isEmpty && !widget.meta.hotspots.any((h) => _control(h) != null)) return;
     final controls = tapControls(root, isControl);
-    final k = kDevice.value.scale;
+    final k = widget.meta.scale;
     final now = {
       for (final h in widget.meta.hotspots)
         if (_control(h) case final c?)

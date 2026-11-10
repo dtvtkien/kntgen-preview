@@ -163,6 +163,7 @@ class PageMeta {
     required this.ready,
     required this.gatePass,
     required this.designHeight,
+    this.designWidth,
     required this.scores,
     required this.fallbackImage,
     required this.hotspots,
@@ -185,6 +186,7 @@ class PageMeta {
         ready: j['ready'] as bool,
         gatePass: j['gate_pass'] as bool? ?? false,
         designHeight: (j['design_h'] as num).toDouble(),
+        designWidth: (j['design_w'] as num?)?.toDouble(),
         scores: (j['scores'] as Map<String, dynamic>? ?? {})
             .map((k, v) => MapEntry(k, (v as num).toDouble())),
         fallbackImage: j['fallback_image'] as String?,
@@ -217,6 +219,9 @@ class PageMeta {
   final bool ready;
   final bool gatePass;
   final double designHeight;
+
+  /// The width the design draws this page at (D1248); null in a flow.json from before it.
+  final double? designWidth;
   final Map<String, double> scores;
   final String? fallbackImage;
 
@@ -246,15 +251,25 @@ class PageMeta {
   /// The feature the page belongs to (lib/feature/<feature>/), as kntgen-naming placed it.
   final String? feature;
 
+  /// The size this page is scaled against on the current screen: its size class, else the design's (D1248).
+  Size get design => designFor(kPageDefs[slug], kScreen);
+
+  /// Screen points per design point (flutter_screenutil `.w` / `.sp`).
+  double get scale => kScreen.width / design.width;
+
+  /// The width its design picture is drawn at: its own for a responsive page, else the design's.
+  double get drawnWidth =>
+      (kPageDefs[slug]?.sizes.isNotEmpty ?? false) ? designWidth ?? kDesign.width : kDesign.width;
+
   /// The body band on the current screen.
   (double, double) get screenBand {
-    final k = kDevice.value.scale;
-    return (bodyWindow.$1 * k, kScreen.height - (kDesign.height - bodyWindow.$2) * k);
+    final k = scale;
+    return (bodyWindow.$1 * k, kScreen.height - (design.height - bodyWindow.$2) * k);
   }
 
   /// Where a design rect sits on the current screen, given the body's scroll offset.
   Rect toScreen(Rect frame, HotspotSlot? slot, double offset) {
-    final k = kDevice.value.scale;
+    final k = scale;
     final r = Rect.fromLTWH(frame.left * k, frame.top * k, frame.width * k, frame.height * k);
     return switch (slot) {
       null => Offset.zero & kScreen,
@@ -267,7 +282,7 @@ class PageMeta {
 
   /// The inverse of [toScreen]: a screen rect back in design points.
   Rect toDesign(Rect screen, HotspotSlot? slot, double offset) {
-    final k = kDevice.value.scale;
+    final k = scale;
     final r = switch (slot) {
       HotspotSlot.bottom => screen.shift(Offset(0, designHeight * k - kScreen.height)),
       HotspotSlot.center => screen.shift(Offset(0, (designHeight * k - kScreen.height) / 2)),

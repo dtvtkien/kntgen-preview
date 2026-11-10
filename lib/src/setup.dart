@@ -11,9 +11,14 @@ class PreviewPage {
     this.surface,
     this.barrierColor,
     this.surfaceSlidesUp = true,
+    this.sizes = const [],
   });
 
   final WidgetBuilder builder;
+
+  /// The sizes a responsive page is drawn at, narrowest first (D1248, Q15): on a screen it is scaled against the one
+  /// its size enum picks, not [PreviewSetup.design]; empty for a page drawn at one size.
+  final List<Size> sizes;
 
   /// A sheet or dialog page: its surface alone, pushed over the page the tap came from.
   final WidgetBuilder? surface;
@@ -145,6 +150,14 @@ ThemeData? pageTheme(PreviewPage def) => (def.theme ?? kSetup.theme)?.call();
 String get kAppTitle => kSetup.title;
 
 Size get kDesign => kSetup.design;
+
+/// The design size [def] is scaled against on [screen] (D1248, Q15): a responsive page's size class, the widest one
+/// the screen is as wide as, else the narrowest, as the page's own size enum picks it; else [kDesign].
+Size designFor(PreviewPage? def, Size screen) {
+  final sizes = def?.sizes ?? const <Size>[];
+  if (sizes.isEmpty) return kDesign;
+  return sizes.lastWhere((s) => screen.width >= s.width, orElse: () => sizes.first);
+}
 
 String get kFigmaFileName => kSetup.figmaFileName;
 

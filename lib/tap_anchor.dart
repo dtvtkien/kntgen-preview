@@ -48,7 +48,9 @@ Future<List<Map<String, dynamic>>> _anchorPage(
   final slug = page['slug'] as String;
   final hs = (page['hotspots'] as List).cast<Map<String, dynamic>>();
   final rows = [for (final h in hs) <String, dynamic>{'node_id': h['node_id']}];
-  final size = Size(kDesign.width, (page['design_h'] as num).toDouble());
+  // D1248: a responsive page is laid out at the width the design draws it at, its own size class
+  final width = def.sizes.isEmpty ? kDesign.width : (page['design_w'] as num).toDouble();
+  final size = Size(width, (page['design_h'] as num).toDouble());
   for (final sheet in [false, if (def.surface != null) true]) {
     final where = sheet ? '$slug (surface)' : slug;
     final _Laid laid;
@@ -124,7 +126,7 @@ Future<_Laid> _layOut(WidgetTester tester, PreviewPage def, Size size, {required
   tester.view.devicePixelRatio = 2;
   addTearDown(tester.view.reset);
   final media = MediaQueryData(size: size, devicePixelRatio: 2);
-  ScreenUtil.configure(data: media, designSize: kDesign, splitScreenMode: false, minTextAdapt: false);
+  ScreenUtil.configure(data: media, designSize: designFor(def, size), splitScreenMode: false, minTextAdapt: false);
   kShowOsChrome.value = true;
   final root = GlobalKey();
   final host = def.tapHost ?? kSetup.tapHost;

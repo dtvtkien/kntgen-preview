@@ -489,8 +489,7 @@ List<(String, String, bool)> _metricRows(PageRow p) {
     ('ui_match', _fmt(p.score('ui')), under('ui')),
     ('structural', _fmt(p.score('st')), under('st')),
     ('deco', _fmt(p.score('deco')), under('deco')),
-    ('iPhone 16e', _fmt(p.device('iphone_16e')), false),
-    ('iPhone 16 Pro Max', _fmt(p.device('iphone_16_pro_max')), false),
+    ('device', _fmt(p.device('iphone_16e')), false),
     (
       'checklist',
       '${p.checklist('pass')} pass · ${p.checklist('fail')} fail',

@@ -860,7 +860,7 @@ class Inspector extends ChangeNotifier {
   /// widget there and keeps the current depth; a repeat tap goes one widget smaller.
   void pick(Offset p) {
     if (tree == null) return;
-    final d = p / kDevice.value.scale;
+    final d = p / (meta?.scale ?? kDevice.value.scale);
     final moved = _lastTap == null || (d - _lastTap!).distance > 5;
     if (moved) {
       _lastTap = d;
