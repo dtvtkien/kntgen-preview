@@ -1,0 +1,20 @@
+name: kntgen_preview
+description: Preview board for generated Flutter pages (Prototype, Inspect and Map modes).
+publish_to: none
+environment:   # the app's own SDK resolves it (D804): proven on Flutter 3.35.7, 3.38.10 and 3.41.6
+  sdk: '>=3.9.0 <4.0.0'
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_test:   # lib/tap_anchor.dart only, the build's tap probe (D597); the preview never imports it
+    sdk: flutter
+  flutter_screenutil: ^5.9.3
+  flutter_svg: ^2.0.0
+  easy_localization: ^3.0.7
+  url_launcher: ^6.3.2
+  http: ^1.2.0
+flutter:
+  fonts:
+    - family: JetBrainsMono   # code text (D595); 'monospace' has no font on Flutter web and fell back to Roboto
+      fonts:
+        - asset: fonts/JetBrainsMono-Regular.ttf

@@ -1,0 +1,3 @@
+# Each UI component on its own line: `dart format` keeps the trailing commas that split them.
+formatter:
+  trailing_commas: preserve
